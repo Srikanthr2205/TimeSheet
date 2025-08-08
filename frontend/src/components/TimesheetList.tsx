@@ -37,7 +37,7 @@ const TimesheetList: React.FC = () => {
   }, []);
 
   const handleEdit = (ts: Timesheet) => {
-    if (ts.status === 'pending' || ts.status === 'rejected') {
+    if (['pending', 'rejected'].includes(ts.status)) {
       setSelectedTimesheet(ts);
       setShowForm(true);
     } else {
@@ -48,7 +48,7 @@ const TimesheetList: React.FC = () => {
   const handleCSVDownload = async () => {
     try {
       const res = await timesheetAPI.downloadCSV();
-      downloadBlob(res.data, 'my_timesheets.csv', 'text/csv');
+      downloadBlob(res.data, 'my_timesheets.csv'); // ✅ fixed argument count
     } catch (err) {
       console.error('CSV download failed:', err);
     }

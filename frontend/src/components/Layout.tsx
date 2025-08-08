@@ -72,7 +72,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, role 
                   ? 'bg-blue-600 text-white shadow'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
-            >
+             >
               <tab.icon size={16} />
               {tab.label}
             </button>

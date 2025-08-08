@@ -11,7 +11,6 @@ import AdminTimesheets from './components/AdminTimesheets';
 
 const AuthScreen: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
-
   return isLogin ? (
     <Login onToggleMode={() => setIsLogin(false)} />
   ) : (
@@ -23,34 +22,24 @@ const MainApp: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  if (!user) {
-    return <AuthScreen />;
-  }
+  if (!user) return <AuthScreen />;
+
+  const isAdmin = user.role === 'admin';
+  const isEmployee = user.role === 'employee';
 
   const renderContent = () => {
-    if (user.role === 'admin') {
-      switch (activeTab) {
-        case 'dashboard':
-          return <AdminDashboard onTabChange={setActiveTab} />;
-        case 'timesheets':
-          return <AdminTimesheets />;
-        case 'employees':
-          return <AdminEmployees />;
-        default:
-          return <AdminDashboard onTabChange={setActiveTab} />;
-      }
-    } else if (user.role === 'employee') {
-      switch (activeTab) {
-        case 'dashboard':
-          return <Dashboard />;
-        case 'timesheets':
-          return <TimesheetList />;
-        default:
-          return <Dashboard />;
-      }
-    } else {
-      return <div className="p-6 text-red-500">Invalid role</div>;
+    if (isAdmin) {
+      if (activeTab === 'dashboard') return <AdminDashboard onTabChange={setActiveTab} />;
+      if (activeTab === 'employees') return <AdminEmployees />;
+      if (activeTab === 'timesheets') return <AdminTimesheets />;
     }
+
+    if (isEmployee) {
+      if (activeTab === 'dashboard') return <Dashboard />;
+      if (activeTab === 'timesheets') return <TimesheetList />;
+    }
+
+    return <div className="p-4 text-red-600">Invalid role or tab</div>;
   };
 
   return (

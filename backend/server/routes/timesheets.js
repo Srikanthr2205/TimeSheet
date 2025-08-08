@@ -175,4 +175,43 @@ router.get('/export/pdf', auth, async (req, res) => {
   }
 });
 
+// Export timesheets as PDF for employee
+router.get('/download-pdf', auth, async (req, res) => {
+  try {
+    const timesheets = await Timesheet.find({ employee: req.user.id }).sort({ date: 1 });
+
+    if (!timesheets.length) {
+      return res.status(404).json({ message: 'No timesheets found.' });
+    }
+
+    
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="timesheets.pdf"');
+    doc.pipe(res);
+
+    doc.fontSize(16).text(`Timesheets for ${req.user.name}`, { align: 'center' });
+    doc.moveDown();
+
+    timesheets.forEach((ts, index) => {
+      doc
+        .fontSize(12)
+        .text(`Date: ${new Date(ts.date).toDateString()}`)
+        .text(`Planned Work: ${ts.plannedWork}`)
+        .text(`Actual Work: ${ts.actualWork}`)
+        .text(`Remarks: ${ts.remarks || '-'}`)
+        .text(`Status: ${ts.status}`)
+        .text(`Admin Comments: ${ts.adminComments || '-'}`);
+      doc.moveDown();
+      if (index < timesheets.length - 1) doc.moveDown();
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error('PDF export error:', err);
+    res.status(500).json({ message: 'PDF generation failed' });
+  }
+});
+
+
 module.exports = router;
